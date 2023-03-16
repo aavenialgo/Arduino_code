@@ -5,11 +5,11 @@
 
 //------------Reemplazar las variables con SSID/Password ----------------------------------
 
-const char* ssid = "pam";                 //"REPLACE_WITH_YOUR_SSID";
-const char* password = "blockdepto022";    //"REPLACE_WITH_YOUR_PASSWORD";
-const char* mqtt_server = "192.168.0.22";  //"YOUR_MQTT_BROKER_IP_ADDRESS";
-  //---------------------------------------------------------
-  //---------------------------------------------------------
+const char* ssid = "NOMBRE-WIFI";
+const char* password = "CONTRASEÑA-WIFI";
+const char* mqtt_server = "IP-BROKER";
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -19,6 +19,7 @@ int value = 0;
 //---------------------------------------------------------
 //---------------------------------------------------------
 float temperature = 0;
+float conductivity = 0;
 
 // LED Pin
 const int ledPin = 4;
@@ -28,7 +29,7 @@ void setup() {
 
   setup_wifi();
   client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+  //client.setCallback(callback);
 
   pinMode(ledPin, OUTPUT);
 }
@@ -51,33 +52,7 @@ void setup_wifi() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 }
-void callback(char* topic, byte* message, unsigned int length) {
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(". Message: ");
-  String messageTemp;
 
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)message[i]);
-    messageTemp += (char)message[i];
-  }
-  Serial.println();
-
-  // Feel free to add more if statements to control more GPIOs with MQTT
-
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off".
-  // Changes the output state according to the message
-  if (String(topic) == "esp32/output") {
-    Serial.print("Changing output to ");
-    if (messageTemp == "on") {
-      Serial.println("on");
-      digitalWrite(ledPin, HIGH);
-    } else if (messageTemp == "off") {
-      Serial.println("off");
-      digitalWrite(ledPin, LOW);
-    }
-  }
-}
 
 void reconnect() {
   // Loop until we're reconnected
@@ -97,38 +72,30 @@ void reconnect() {
     }
   }
 }
+
 void loop() {
   if (!client.connected()) {
     reconnect();
   }
   client.loop();
 
-  long now = millis();
-  if (now - lastMsg > 5000) {
-    lastMsg = now;
+  // Temperature in Celsius
+  temperature = random(15, 27);
+  
 
-    // Temperature in Celsius
-    //randomNumber = random(15, 27);
-    temperature = random(15, 27);
-      // Uncomment the next line to set temperature in Fahrenheit
-      // (and comment the previous temperature line)
-      //temperature = 1.8 * bme.readTemperature() + 32; // Temperature in Fahrenheit
+  // Convert the value to a char array
+  char tempString[8];
+  dtostrf(temperature, 1, 2, tempString);
+  Serial.print("Temperature: ");
+  Serial.println(tempString);
+  client.publish("tanque_001/temperatura", tempString);
 
-      // Convert the value to a char array
-    char tempString[8];
-    dtostrf(temperature, 1, 2, tempString);
-    Serial.print("Temperature: ");
-    Serial.println(tempString);
-    client.publish("tanque_001/temperatura", tempString);
+  conductivity = random(50, 3000);
 
-   // randomNumber2 = random(50, 3000);
-   // conductivity = random(50, 3000);
 
-      // Convert the value to a char array
- //     char conString[8];
-  //  dtostrf(conductivity, 1, 2, conString);
-   // Serial.print("conductivity: ");
-  //  Serial.println(conString);
-   // client.publish("tanque_001/conductividad", conString);
-  }
+  //char condString[8];
+  //dtostrf(conductivity, 1, 2, conString);
+  //Serial.print("conductivity: ");
+  //Serial.println(condString);
+  //client.publish("tanque_001/conductividad", conductivity);
 }

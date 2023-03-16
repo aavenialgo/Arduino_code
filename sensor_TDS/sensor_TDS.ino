@@ -2,9 +2,9 @@
  1. More details, please click this link: <https://www.dfrobot.com/wiki/index.php/Gravity:_Analog_TDS_Sensor_/_Meter_For_Arduino_SKU:_SEN0244>
  ****************************************************/
 
-#define TdsSensorPin A1
-#define VREF 5.0      // analog reference voltage(Volt) of the ADC
-#define SCOUNT  30           // sum of sample point
+#define TdsSensorPin A1;
+#define VREF 5.0  ;    // analog reference voltage(Volt) of the ADC
+#define SCOUNT  30   ;        // sum of sample point
 int analogBuffer[SCOUNT];    // store the analog value in the array, read from ADC
 int analogBufferTemp[SCOUNT];
 int analogBufferIndex = 0,copyIndex = 0;
@@ -31,8 +31,8 @@ void loop()
    if(millis()-printTimepoint > 800U)
    {
       printTimepoint = millis();
-      for(copyIndex=0;copyIndex<SCOUNT;copyIndex++)
-        analogBufferTemp[copyIndex]= analogBuffer[copyIndex];
+      for(copyIndex=0;copyIndex<SCOUNT;copyIndex++){
+        analogBufferTemp[copyIndex]= analogBuffer[copyIndex];}
       averageVoltage = getMedianNum(analogBufferTemp,SCOUNT) * (float)VREF / 1024.0; // read the analog value more stable by the median filtering algorithm, and convert to voltage value
       float compensationCoefficient=1.0+0.02*(temperature-25.0);    //temperature compensation formula: fFinalResult(25^C) = fFinalResult(current)/(1.0+0.02*(fTP-25.0));
       float compensationVolatge=averageVoltage/compensationCoefficient;  //temperature compensation
