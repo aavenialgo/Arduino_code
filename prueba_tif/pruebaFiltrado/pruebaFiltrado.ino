@@ -1,5 +1,9 @@
 #include <Wire.h>
 #include "MAX30105.h"
+#include <Filters.h>
+
+FilterOnePole lowpassFilter(LOWPASS, 0.5);
+FilterOnePole highpassFilter(HIGHPASS, 15);
 
 MAX30105 particleSensor;
 TwoWire myWire(0);
