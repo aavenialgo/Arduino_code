@@ -23,14 +23,19 @@ class BiquadFilter {
     float x1, x2, y1, y2;
 };
 
-// ===== Butterworth 4º orden pasa banda (0.5–15 Hz @ fs=125 Hz) =====
+// ===== Butterworth 4º orden pasa banda (0.5–15 Hz @ fs=100 Hz) =====
 class ButterworthBandPass4 {
   public:
     ButterworthBandPass4()
-      : stage1(0.007961, 0.01592, 0.0079607, -0.9427, 0.2500),
-        stage2(1.0, 2.0, 1.0, -1.1761, 0.6047),
-        stage3(1.0, -2.0, 1.0, -1.9519, 0.9525),
-        stage4(1.0, -2.0, 1.0, -1.9811, 0.9818) {}
+      // Stage 1 (Q = 0.54): HP 0.5Hz
+      : stage1(0.97803, -1.95606, 0.97803, -1.95558, 0.95654),
+      // Stage 2 (Q = 1.31): HP 0.5Hz
+        stage2(0.97724, -1.95448, 0.97724, -1.95358, 0.95537),
+
+      // Stage 3 (Q = 0.54): LP 15Hz
+        stage3(0.04953, 0.09907, 0.04953, -1.13967, 0.48551),
+      // Stage 4 (Q = 1.31): LP 15Hz
+        stage4(0.05831, 0.11662, 0.05831, -0.97043, 0.23399) {}
 
     float process(float x) {
       float y = stage1.process(x);
@@ -64,9 +69,9 @@ void setup() {
   delay(1000);
 
   byte ledBrightness = 0x3F;
-  byte sampleAverage = 2;
+  byte sampleAverage = 4;
   byte ledMode = 2;
-  int sampleRate = 125;
+  int sampleRate = 400;
   int pulseWidth = 411;
   int adcRange = 16384;
 
